@@ -1,6 +1,6 @@
 # Implementation plan
 
-Authority: [_specs/ace-mvp-specification-v1.1.md](../_specs/ace-mvp-specification-v1.1.md), especially Sections 16–18. This plan follows its implementation order. All application milestones below are pending; repository documentation is the current scope.
+Authority: [_specs/ace-mvp-specification-v1.1.md](../_specs/ace-mvp-specification-v1.1.md), especially Sections 16–18. This plan follows its implementation order. All engine milestones below are pending. A separate static welcome page in `site/` establishes public GitHub Pages hosting before engine implementation.
 
 ## 1. Host, storage, seed, and runtime
 

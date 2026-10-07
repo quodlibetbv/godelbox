@@ -6,7 +6,7 @@ An independent host provides the permanent prompt, Start, Stop, Settings, Files,
 
 ## Status
 
-Project definition and repository foundation only. The application, package scripts, and acceptance tests have not been implemented. There are no runnable installation, development, or build commands yet.
+The public [welcome page](https://delorionbv.github.io/godelbox/) introduces the project and its namesake, Kurt Friedrich Gödel. It is a static hello-world document; the adaptive application engine, package scripts, and acceptance tests have not been implemented yet.
 
 The supplied [prototype specification](_specs/ace-mvp-specification-v1.1.md) is the implementation authority. Godelbox is the project name; ACE is the specification's working name. Existing `ace/1`, `window.ace`, storage keys, and export formats remain the specified contracts until explicitly revised.
 
@@ -29,6 +29,23 @@ Snapshots copy the entire virtual filesystem. Restore preserves existing history
 - [Project understanding](docs/project-understanding.md): intended behavior, boundaries, and implementation risks.
 - [Implementation plan](docs/implementation-plan.md): ordered milestones and evidence required for delivery.
 - [Agent guidance](AGENTS.md): repository conventions and engineering requirements.
+- [Product context](PRODUCT.md): purpose, naming, and the welcome page's design choices.
+
+## Welcome page and GitHub Pages
+
+The welcome document and favicon live in `site/`. Preview them locally with:
+
+```bash
+python3 -m http.server 5173 --bind 127.0.0.1 --directory site
+```
+
+Open `http://127.0.0.1:5173/`. Port 5173 is fixed; this static server is preview tooling only. The page has no build step, JavaScript, third-party asset requests, or model configuration.
+
+[The Pages workflow](.github/workflows/pages.yml) publishes only `site/` after changes to that directory or the workflow reach `main`. It can also be run manually from GitHub Actions. GitHub Pages uses GitHub Actions as its publishing source. Official deployment actions are pinned to commit SHAs; deployment uses GitHub's provided job token and requires no repository credential secrets.
+
+When the adaptive engine is implemented, update this workflow to build and publish its static output. The welcome page does not establish any of the engine's A01–A30 acceptance results.
+
+The local static-page smoke test passed in headless Chromium 149.0.7827.55 at viewport widths 1440, 390, and 320 pixels: page/favicon returned HTTP 200, no horizontal overflow or browser errors occurred, keyboard focus was visible, and tested text contrast exceeded 4.5:1. Desktop and mobile screenshots were visually reviewed. This verifies the welcome document only.
 
 ## Secrets and repository contents
 

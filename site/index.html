@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Godelbox: an experiment in software you can reshape, with a version history and a way back. Named in honour of Kurt Friedrich Gödel.">
+    <meta name="color-scheme" content="light">
+    <title>Godelbox — Hello, world.</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <style>
+      :root {
+        --background: oklch(1 0 0);
+        --ink: oklch(0.23 0.008 110);
+        --muted: oklch(0.45 0.012 110);
+        --primary: oklch(0.43 0.09 110);
+        --line: oklch(0.89 0.008 110);
+        --surface: oklch(0.97 0.008 110);
+        --accent: oklch(0.29 0.05 260);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--ink);
+        background: var(--background);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100svh;
+      }
+
+      .page {
+        width: min(100% - 3rem, 68rem);
+        min-height: 100svh;
+        margin-inline: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding-block: 2rem;
+      }
+
+      .identity {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        font-size: 1.25rem;
+        letter-spacing: -0.025em;
+      }
+
+      .mark { width: 2rem; height: 2rem; color: var(--primary); }
+
+      a {
+        color: var(--primary);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.25em;
+      }
+
+      a:hover { color: var(--accent); }
+      a:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+
+      header a { font-size: 0.9375rem; }
+
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding-block: clamp(3rem, 8vh, 7rem);
+      }
+
+      .greeting {
+        margin: 0 0 1.5rem;
+        color: var(--primary);
+        font-size: 1rem;
+      }
+
+      h1 {
+        max-width: 12ch;
+        margin: 0;
+        font-size: clamp(3rem, 7.8vw, 6rem);
+        font-weight: 500;
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+      }
+
+      .introduction {
+        max-width: 39ch;
+        margin: 2rem 0 0;
+        font-size: clamp(1.125rem, 2vw, 1.375rem);
+        line-height: 1.6;
+        text-wrap: pretty;
+      }
+
+      .dedication {
+        max-width: 65ch;
+        margin-top: clamp(3rem, 6vh, 4.5rem);
+        padding: 1.5rem;
+        background: var(--surface);
+        line-height: 1.65;
+      }
+
+      .dedication p { margin: 0; }
+      .dedication p + p { margin-top: 0.75rem; color: var(--muted); }
+      .dedication a { display: inline-block; margin-top: 1rem; }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        column-gap: 2rem;
+        row-gap: 0.5rem;
+        padding-block: 1.5rem;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.875rem;
+        line-height: 1.6;
+      }
+
+      footer p { margin: 0; }
+
+      @media (max-width: 480px) {
+        .page { width: calc(100% - 2rem); }
+        header { padding-block: 1.5rem; }
+        .dedication { padding: 1.25rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div class="identity">
+          <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M27 19V5H5V27H19M19 13H13V19H19V13ZM19 19L27 27" stroke="currentColor" stroke-width="2" stroke-linecap="square" />
+          </svg>
+          <span>Godelbox</span>
+        </div>
+        <a href="https://github.com/delorionbv/godelbox">View source <span aria-hidden="true">↗</span></a>
+      </header>
+
+      <main>
+        <p class="greeting">Hello, world.</p>
+        <h1>A canvas for apps that can change.</h1>
+        <p class="introduction">An experiment in software you can reshape—with a prompt, a version history, and a way back.</p>
+
+        <aside class="dedication" aria-label="Behind the name">
+          <p>Named in honour of <strong>Kurt Friedrich Gödel.</strong></p>
+          <p>Gödel explored the limits of formal proof. Here, the question is what happens when software can inspect and rewrite its own files, while keeping earlier versions within reach.</p>
+          <a href="https://www.ias.edu/scholars/godel">About Kurt Gödel <span aria-hidden="true">↗</span></a>
+        </aside>
+      </main>
+
+      <footer>
+        <p>The first page. The canvas comes next.</p>
+        <p>Built to change. Built to return.</p>
+      </footer>
+    </div>
+  </body>
+</html>

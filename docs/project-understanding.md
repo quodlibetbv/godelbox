@@ -47,4 +47,4 @@ These are testing obligations, not reasons to expand the MVP into a production p
 
 Choose actual Node/dependency versions, the fixed development origin/port, a small persistence wrapper or direct IndexedDB implementation, test tooling, and concrete host visual design when scaffolding begins. Pin and record those choices. Select a live model at test time through Settings; do not bake a provider model into the app.
 
-The owner has requested a private `delorionbv/godelbox` repository and may later make it public. Private visibility does not authorize committing secrets, and it does not establish an open-source license. No application code or acceptance behavior is currently implemented or verified.
+The owner has requested that `delorionbv/godelbox` become public and publish a first welcome document through GitHub Pages. Public visibility does not establish an open-source license. The static page introduces the project and its namesake; the adaptive engine and its acceptance behavior remain unimplemented.

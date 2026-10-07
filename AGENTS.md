@@ -6,7 +6,9 @@ Read `README.md`, `_specs/ace-mvp-specification-v1.1.md`, and `docs/implementati
 
 Godelbox is the project name. Preserve the specification's ACE SDK, storage, runtime, and export identifiers unless a deliberate contract revision is requested. Keep the supplied specification intact; record interpretation or proposed changes separately.
 
-The current repository contains documentation only. Do not claim a runnable application, passing acceptance test, or verified provider/browser behavior without execution evidence. Do not implement beyond the user's authorized scope.
+The repository currently contains project documentation and a static welcome page in `site/`, published to GitHub Pages by `.github/workflows/pages.yml`. The adaptive engine is not implemented. Do not claim engine behavior, a passing acceptance test, or verified provider/browser behavior without execution evidence. Do not implement beyond the user's authorized scope.
+
+Read `PRODUCT.md` when changing the public page. The current page has no dependencies or build step. Preview it with the fixed local URL documented in README. Keep deployed assets in `site/`; the Pages artifact must not include the repository root, project exports, browser state, or local credential files. Preserve the workflow's immutable action pins and minimal permissions.
 
 ## Architecture
 
