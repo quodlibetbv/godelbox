@@ -14,6 +14,7 @@ import { Diagnostics, diagnosticDetails } from '../shared/diagnostics'
 interface EngineState {
   loading: boolean; writable: boolean; prompt: string; project?: Project; workspace?: Workspace; snapshots: Snapshot[]; limits: HostLimits; allowance: Allowance; usage: RequestUsage[]; connection: ModelConnection
   runtimeStatus: string; aiStatus: string; settingsError: string; error: string; errors: string[]; info: string; calls: number; tools: number; filesBusy: boolean; unsavedDraft: boolean; settingsInitially: boolean; connectionTest: string
+  editOutcome?: 'changed' | 'conversation-only'
 }
 export class Engine {
   state = reactive<EngineState>({ loading: true, writable: false, prompt: '', snapshots: [], limits: { ...DEFAULT_LIMITS }, allowance: { epochId: '', usedRequests: 0, resetAt: 0 }, usage: [], connection: defaults(), runtimeStatus: 'Stopped', aiStatus: 'Idle', settingsError: '', error: '', errors: [], info: '', calls: 0, tools: 0, filesBusy: false, unsavedDraft: false, settingsInitially: false, connectionTest: '' })
@@ -114,7 +115,7 @@ export class Engine {
     try {
       await this.database.resetProject(seedFiles(), valid); await this.refresh()
       if (valid()) {
-        this.state.prompt = ''; this.state.error = ''; this.state.errors = []; this.state.aiStatus = 'Idle'; this.state.calls = 0; this.state.tools = 0
+        this.state.prompt = ''; this.state.error = ''; this.state.errors = []; this.state.aiStatus = 'Idle'; this.state.calls = 0; this.state.tools = 0; this.state.editOutcome = undefined
         this.state.info = 'Fresh universe created. Press Start. Your connection, limits, and request usage are unchanged.'
         this.logs.record('host', { message: 'Project reset; settings and usage retained', revision: this.state.workspace?.revision })
       }
@@ -169,7 +170,7 @@ export class Engine {
   }
   async edit(prompt: string, ignore = false) {
     this.requireWriter(); requireValue(prompt.trim(), 'Enter a prompt.')
-    this.stop(); const operation = this.newOperation(); this.state.error = ''; this.state.aiStatus = 'Calling model'; this.state.info = ''
+    this.stop(); const operation = this.newOperation(); this.state.error = ''; this.state.aiStatus = 'Calling model'; this.state.info = ''; this.state.editOutcome = undefined
     try {
       await this.database.checkpoint(this.state.workspace!.projectId, 'before-edit', 'Before edit', true, operation.current)
       await this.refresh(); requireValue(operation.current(), 'Edit cancelled.', 'SESSION_EXPIRED')
@@ -187,6 +188,7 @@ export class Engine {
         this.state.aiStatus = 'Idle'; this.state.info = appChanges.length ? `Saved “${this.head?.label}”. Changed files: ${appChanges.join(', ')}.` : 'No app changes made. Only the editor conversation was saved. Your app remains unchanged.'
         this.operation = undefined
         await this.start()
+        this.state.editOutcome = appChanges.length ? 'changed' : 'conversation-only'
         return appChanges.length > 0
       }
     } catch (error) { if (operation.current()) { this.state.aiStatus = 'Failed'; this.state.error = this.message(error, operation.connection) } }

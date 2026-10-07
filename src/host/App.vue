@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Engine } from './engine'
 import { defaults } from '../storage/connection'
 import { fileBytes, inventory, readText } from '../shared/files'
@@ -10,6 +10,7 @@ const favicon = `${import.meta.env.BASE_URL}favicon.svg`
 const canvas = ref<HTMLElement>(), panel = ref(''), ignore = ref(false), label = ref(''), selected = ref(''), selectedFile = ref('/app/app.js')
 const prompt = computed({ get: () => state.prompt, set: value => { state.prompt = value } })
 const promptVisible = ref(false)
+watch(() => state.editOutcome, outcome => { if (outcome) promptVisible.value = outcome === 'conversation-only' })
 const hostReady = ref(false)
 const form = ref<ModelConnection>(defaults()), limitsForm = ref<HostLimits>({ ...state.limits }), headers = ref('{}'), reveal = ref(false), models = ref<string[]>([]), settingsNotice = ref(''), importFile = ref<File>(), fileInput = ref<HTMLInputElement>()
 const busy = computed(() => ['Calling model', 'Using tools', 'Saving'].includes(state.aiStatus) || state.filesBusy)
@@ -49,7 +50,7 @@ async function saveSettings() {
   }
   catch (error) { settingsNotice.value = 'Not saved'; engine.report(error) }
 }
-async function send() { if (await engine.edit(prompt.value.trim(), ignore.value)) { prompt.value = ''; promptVisible.value = false } }
+async function send() { if (await engine.edit(prompt.value.trim(), ignore.value)) prompt.value = '' }
 function shortcut(event: KeyboardEvent) { if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.isComposing) { event.preventDefault(); if (!busy.value && state.writable && prompt.value.trim()) void act(send) } }
 function downloadJson(value: unknown, name: string) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }))

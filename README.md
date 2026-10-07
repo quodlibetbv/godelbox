@@ -15,7 +15,7 @@ Open **[Godelbox](https://quodlibetbv.github.io/godelbox/)**. It is named in hon
 
 Already have the earlier counter app or another saved project? Open **Settings → Load universe starter**. This preserves your current files in History, including acknowledged unsaved changes, and keeps your connection and usage. Existing projects are never silently replaced on reload.
 
-The app fills the window below a slim black header. The panel icon shows or hides the host prompt; hiding it keeps unsent text. A host edit that changes app files closes the prompt panel and returns the canvas to full width. History, Files, Errors, and Save version are inside that panel. Start/Stop and the Settings and GitHub icons remain in the header. On narrow screens the prompt opens over the canvas.
+The app fills the window below a slim black header. The panel icon shows or hides the host prompt; hiding it keeps unsent text. An edit that changes app files closes the prompt panel and returns the canvas to full width. A conversation-only result opens the panel so you can see that no app changes were made and retry. History, Files, Errors, and Save version are inside that panel. Start/Stop and the Settings and GitHub icons remain in the header. On narrow screens the prompt opens over the canvas.
 
 ## Transform the app, then use it
 
