@@ -6,12 +6,14 @@ Open **[Godelbox](https://quodlibetbv.github.io/godelbox/)**. It is named in hon
 
 ## Start using it
 
-1. Press **Start**. The local starter app works without a model or API key.
+1. Press **Start** to explore a slowly rotating p5.js universe. It works without a model or API key, including offline after the host loads. **Pause motion** freezes the scene; reduced-motion preferences start it paused.
 2. Open **Settings**, choose OpenRouter or a compatible endpoint, enter its base URL, model ID, and key, then **Save settings**. Optional headers, token field, instruction role, timeout, and limits are editable.
 3. **Test connection** verifies chat connectivity and a real tool round-trip. **Load models** is optional; you can enter a model ID manually.
-4. Change the counter and write a note. Wait for **Saved**, then save a version named **Before changes**.
-5. Prompt “Add a reset button without losing my note.” The app pauses while file tools edit a draft. A successful turn saves a child version and starts a fresh canvas.
-6. Open **History**, select **Before changes**, and **Restore selected version**. Your earlier code and data return; newer branches remain available.
+4. The universe asks **“What do you want me to become?”** Enter an idea, such as “Become a star atlas”, and press **Become** or Ctrl/Cmd + Enter. Your typed prompt persists locally. The permanent host prompt works too, even if the app has no interface.
+5. The app pauses while file tools edit a draft using your saved model connection and limits. A successful turn saves a child version and starts a fresh canvas. Without a connection, the universe shows an instruction to open Settings and places your prompt in the host for retry.
+6. Open **History**, select an earlier version, and **Restore selected version**. Its code and data return; newer branches remain available.
+
+Already have the earlier counter app or another saved project? Open **Settings → Load universe starter**. This preserves your current files in History, including acknowledged unsaved changes, and keeps your connection and usage. Existing projects are never silently replaced on reload.
 
 The model must support Chat Completions tool calling and direct browser requests with CORS. Plain chat support alone is insufficient. Requests go straight to your saved endpoint, without a backend or proxy. Provider failures are visible; there is no simulated fallback or automatic retry. Generated app quality depends on the selected model.
 
@@ -56,7 +58,9 @@ An iframe sandbox is not a universal CPU or memory guarantee. Stop successfully 
 
 ## Project and evidence
 
-The supplied [specification](_specs/ace-mvp-specification-v1.1.md) governs the engine. Godelbox is the project name; `window.ace`, `ace/1`, storage keys, and export contracts retain the specification's ACE identifiers. The host uses TypeScript, Vue 3, and Vite. Generated apps use HTML fragments, CSS, and classic browser scripts; Vue is a locally packaged seed dependency, not an app-type requirement.
+The supplied [specification](_specs/ace-mvp-specification-v1.1.md) governs the engine. Godelbox is the project name; `window.ace`, `ace/1`, storage keys, and export contracts retain the specification's ACE identifiers. The host uses TypeScript, Vue 3, and Vite. At the owner's request, the starter now uses locally packaged p5.js 2.3.3 instead of the specification's counter. Generated apps can use HTML fragments, CSS, and any compatible classic browser scripts.
+
+The universe submits through the SDK extension `ace.runtime.requestEdit(prompt)`, which requires recent user activation and hands control to the permanent host editor. An accepted edit stops that iframe; it must not expect to keep running after the call. Credentials remain in the host.
 
 - [Implementation and acceptance evidence](docs/implementation-report.md)
 - [Project understanding](docs/project-understanding.md)
@@ -66,4 +70,4 @@ The supplied [specification](_specs/ace-mvp-specification-v1.1.md) governs the e
 
 ## Repository secrets
 
-Treat every commit and its history as public. Never commit real credentials, connection records, browser profiles, captured user/provider data, or exported projects. Use unmistakably synthetic fixture values. [.gitignore](.gitignore) excludes local configuration and artifacts, but actual staged contents must also pass a secret scan before every commit/push. Scan full history before any visibility change. Public availability does not establish an open-source license; bundled Vue retains its MIT notice.
+Treat every commit and its history as public. Never commit real credentials, connection records, browser profiles, captured user/provider data, or exported projects. Use unmistakably synthetic fixture values. [.gitignore](.gitignore) excludes local configuration and artifacts, but actual staged contents must also pass a secret scan before every commit/push. Scan full history before any visibility change. Public availability does not establish an open-source license for Godelbox. Bundled p5.js retains its LGPL-2.1 notice and exact [corresponding source](https://quodlibetbv.github.io/godelbox/vendor/p5-2.3.3/p5.js); Vue retains its MIT notice.

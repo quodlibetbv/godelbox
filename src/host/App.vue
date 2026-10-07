@@ -7,7 +7,8 @@ import type { HostLimits, ModelConnection } from '../shared/types'
 
 const engine = new Engine(), state = engine.state
 const favicon = `${import.meta.env.BASE_URL}favicon.svg`
-const canvas = ref<HTMLElement>(), panel = ref(''), prompt = ref(''), ignore = ref(false), label = ref(''), selected = ref(''), selectedFile = ref('/app/app.js')
+const canvas = ref<HTMLElement>(), panel = ref(''), ignore = ref(false), label = ref(''), selected = ref(''), selectedFile = ref('/app/app.js')
+const prompt = computed({ get: () => state.prompt, set: value => { state.prompt = value } })
 const form = ref<ModelConnection>(defaults()), limitsForm = ref<HostLimits>({ ...state.limits }), headers = ref('{}'), reveal = ref(false), models = ref<string[]>([]), settingsNotice = ref(''), importFile = ref<File>(), fileInput = ref<HTMLInputElement>()
 const busy = computed(() => ['Calling model', 'Using tools', 'Saving'].includes(state.aiStatus) || state.filesBusy)
 const head = computed(() => engine.head)
@@ -53,6 +54,10 @@ function download(draft = false) {
   const link = document.createElement('a'); link.href = url; link.download = draft ? 'godelbox-unsaved-edit.ace-project.json' : 'godelbox.ace-project.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 function chooseImport(event: Event) { importFile.value = (event.target as HTMLInputElement).files?.[0] }
+async function loadUniverse() {
+  if (!window.confirm('Load the universe starter? Your current files will be preserved in History.')) return
+  await engine.loadStarter(); panel.value = ''
+}
 async function replaceProject() {
   if (!importFile.value) return
   if (!window.confirm('Replace the current project and its history? Export your current project first if you want to keep it. Your connection and request usage will remain unchanged.')) return
@@ -101,7 +106,7 @@ onBeforeUnmount(() => engine.dispose())
       <aside class="prompt-region" aria-label="Host prompt">
         <div class="prompt-heading"><h2>Shape your app</h2><span>Always within reach</span></div>
         <div class="conversation" aria-live="polite">
-          <p v-if="!pairs.length" class="prompt-intro">Start with a small change. Try “Add a reset button without losing my note.”</p>
+          <p v-if="!pairs.length" class="prompt-intro">Describe what you want your app to become. Try “Become a star atlas.”</p>
           <article v-for="(pair, index) in pairs" :key="`${pair.timestamp}-${index}`" :class="['message', pair.role]"><h3>{{ pair.role === 'user' ? 'You' : 'Godelbox' }}</h3><p>{{ pair.content }}</p></article>
           <p v-if="state.info" class="operation-info" role="status">{{ state.info }}</p>
           <div v-if="state.unsavedDraft" class="notice error"><p>Not saved. The completed edit remains in memory.</p><button @click="act(() => engine.retryDraft())" :disabled="busy">Retry saving edit</button><button @click="act(() => download(true))">Export unsaved edit</button></div>
@@ -170,6 +175,7 @@ onBeforeUnmount(() => engine.dispose())
         <button :disabled="!state.writable" @click="act(() => { engine.clearConnection(); form = defaults(); headers = '{}'; models = []; settingsNotice = 'Connection cleared' })">Clear saved connection</button>
         <hr><h3>Usage records</h3><button :disabled="busy || !state.writable" @click="act(() => engine.resetAllowance())">Reset request allowance</button><p class="hint">Only this explicit reset replenishes requests. Restore, reload, and import do not.</p>
         <ul class="usage"><li v-for="u in state.usage.slice(0, 20)" :key="u.id"><strong>{{ u.source }} · {{ u.outcome }}</strong><small>{{ u.model }} · {{ date(u.startedAt) }}</small><small>Tokens: {{ u.promptTokens ?? 'unknown' }} input / {{ u.completionTokens ?? 'unknown' }} output · Cost: {{ u.providerCost === undefined ? 'unknown' : `${u.providerCost} ${u.providerCostUnit}` }}</small></li></ul>
+        <hr><h3>Starter app</h3><p class="hint">Load the animated universe as a new version. Current files and earlier versions remain in History; connection and usage stay unchanged.</p><button :disabled="state.filesBusy || !state.writable" @click="act(loadUniverse)">Load universe starter</button>
         <hr><h3>Project backup</h3><button @click="act(() => download())">Export project</button><p class="hint">Exports include all historical code, data, instructions, and prompts. They exclude the connection, headers, and usage records.</p>
         <label for="import-file">Import project JSON (up to 128 MiB)</label><input id="import-file" ref="fileInput" type="file" accept="application/json,.json" :disabled="!state.writable" @change="chooseImport"><button :disabled="!importFile || !state.writable" @click="act(replaceProject)">Import and replace project</button>
         <hr><p class="hint">Named in honour of Kurt Friedrich Gödel. <a href="./about.html">About Godelbox</a> · <a href="https://github.com/quodlibetbv/godelbox">Source</a></p>

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { MOCK, appFrame, boot, calls, change, closePanel, configure, mockEditor, reply, restore, saveVersion, saved, start, state } from './helpers'
 
-test('A01/A04/A17: no-key seed, acknowledged persistence, stopped reload, markup stays data', async ({ page }) => {
+test('A04/A17: no-key counter fixture, acknowledged persistence, stopped reload, markup stays data', async ({ page }) => {
   const requests: string[] = []; page.on('request', r => requests.push(r.url()))
   await boot(page); const app = await start(page)
   await expect(app.getByRole('heading', { name: 'My adaptive app' })).toBeVisible()

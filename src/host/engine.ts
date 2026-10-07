@@ -11,11 +11,11 @@ import { appInstructions, conversation, runEditor } from '../ai/editor'
 import { HOST_INSTRUCTIONS } from '../ai/instructions'
 
 interface EngineState {
-  loading: boolean; writable: boolean; project?: Project; workspace?: Workspace; snapshots: Snapshot[]; limits: HostLimits; allowance: Allowance; usage: RequestUsage[]; connection: ModelConnection
+  loading: boolean; writable: boolean; prompt: string; project?: Project; workspace?: Workspace; snapshots: Snapshot[]; limits: HostLimits; allowance: Allowance; usage: RequestUsage[]; connection: ModelConnection
   runtimeStatus: string; aiStatus: string; settingsError: string; error: string; errors: string[]; info: string; calls: number; tools: number; filesBusy: boolean; unsavedDraft: boolean; settingsInitially: boolean; connectionTest: string
 }
 export class Engine {
-  state = reactive<EngineState>({ loading: true, writable: false, snapshots: [], limits: { ...DEFAULT_LIMITS }, allowance: { epochId: '', usedRequests: 0, resetAt: 0 }, usage: [], connection: defaults(), runtimeStatus: 'Stopped', aiStatus: 'Idle', settingsError: '', error: '', errors: [], info: '', calls: 0, tools: 0, filesBusy: false, unsavedDraft: false, settingsInitially: false, connectionTest: '' })
+  state = reactive<EngineState>({ loading: true, writable: false, prompt: '', snapshots: [], limits: { ...DEFAULT_LIMITS }, allowance: { epochId: '', usedRequests: 0, resetAt: 0 }, usage: [], connection: defaults(), runtimeStatus: 'Stopped', aiStatus: 'Idle', settingsError: '', error: '', errors: [], info: '', calls: 0, tools: 0, filesBusy: false, unsavedDraft: false, settingsInitially: false, connectionTest: '' })
   private database!: Database
   private runtime?: Runtime
   private gateway!: ModelGateway
@@ -89,6 +89,17 @@ export class Engine {
       await this.refresh()
       if (epoch === this.epoch) { this.state.filesBusy = false; await this.start(); this.state.info = `Restored ${this.head?.label}. Code, data, dependencies, and instructions were restored together.` }
     } finally { if (epoch === this.epoch) this.state.filesBusy = false }
+  }
+  async loadStarter() {
+    this.requireWriter(); this.stop(); this.state.filesBusy = true
+    const epoch = this.epoch, valid = () => epoch === this.epoch
+    try {
+      await this.database.checkpoint(this.state.workspace!.projectId, 'manual', 'Before loading universe', true, valid)
+      await this.refresh()
+      await this.database.commit(this.state.workspace!.projectId, seedFiles(), this.state.workspace!.revision, 'Universe starter', '', valid, 'manual')
+      await this.refresh()
+      if (valid()) { this.state.filesBusy = false; this.state.aiStatus = 'Idle'; await this.start(); this.state.info = 'Universe starter loaded. Earlier versions remain in History.' }
+    } finally { if (valid()) this.state.filesBusy = false }
   }
   exportProject(draft = false): ProjectExport {
     requireValue(this.state.project && this.state.workspace, 'No project is available.')
@@ -192,6 +203,15 @@ export class Engine {
     const workspace = this.state.workspace!
     if (method === 'runtime.ready') { this.runtime?.ready(); return }
     if (method === 'runtime.error') { this.runtime?.error(params.message); return }
+    if (method === 'runtime.requestEdit') {
+      requireValue(!this.busy, 'Wait for the current operation or press Stop.', 'WORKSPACE_BUSY')
+      requireValue(navigator.userActivation?.isActive, 'Submit a change with a click or keyboard action.', 'USER_ACTION_REQUIRED')
+      requireValue(params.prompt.trim(), 'Enter a prompt.')
+      const prompt = params.prompt.trim(); this.state.prompt = prompt
+      requireValue(this.state.connection.model && (this.state.connection.authMode === 'none' || this.state.connection.apiKey), 'Open host Settings and save your model connection, then send this prompt.', 'AI_REQUEST_FAILED')
+      if (await this.edit(prompt) && this.state.prompt === prompt) this.state.prompt = ''
+      return
+    }
     if (method === 'fs.list') return inventory(workspace.files, params.prefix)
     if (method === 'fs.getRevision') return workspace.revision
     if (method === 'fs.readText') return readText(workspace.files, params.path)

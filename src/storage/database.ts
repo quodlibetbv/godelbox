@@ -29,7 +29,7 @@ export class Database {
       const existing: Project[] = await this.db.getAll('projects')
       if (!existing.length && writable) {
         validateFiles(files)
-        const project: Project = { id: crypto.randomUUID(), name: 'My adaptive app', createdAt: Date.now() }
+        const project: Project = { id: crypto.randomUUID(), name: 'Godelbox', createdAt: Date.now() }
         const workspace: Workspace = { projectId: project.id, revision: 0, lastCheckpointRevision: 0, headSnapshotId: '', files: copyFiles(files) }
         const snapshot = this.snapshot(workspace, 'seed', 'First version'); workspace.headSnapshotId = snapshot.id
         const tx = this.db.transaction(['projects', 'workspaces', 'snapshots', 'settings'], 'readwrite'); void tx.done.catch(() => {})
@@ -100,7 +100,7 @@ export class Database {
       } catch (error) { try { tx.abort() } catch {} await tx.done.catch(() => {}); throw error }
     })
   }
-  commit(projectId: string, files: FileMap, revision: number, prompt: string, model: string, valid: () => boolean) {
+  commit(projectId: string, files: FileMap, revision: number, prompt: string, model: string, valid: () => boolean, reason: 'ai-edit' | 'manual' = 'ai-edit') {
     validateFiles(files)
     const plain = copyFiles(files)
     return this.run(async () => {
@@ -110,7 +110,7 @@ export class Database {
         requireValue(valid(), 'Edit cancelled.', 'SESSION_EXPIRED')
         requireValue(workspace.revision === revision, 'Edit base revision is stale.', 'REVISION_CONFLICT')
         workspace.files = plain; workspace.revision++; workspace.lastCheckpointRevision = workspace.revision
-        const snapshot = this.snapshot(workspace, 'ai-edit', prompt.slice(0, 80), { prompt, model }); workspace.headSnapshotId = snapshot.id
+        const snapshot = this.snapshot(workspace, reason, prompt.slice(0, 80), reason === 'ai-edit' ? { prompt, model } : {}); workspace.headSnapshotId = snapshot.id
         await tx.objectStore('snapshots').add(snapshot); await tx.objectStore('workspaces').put(workspace); await tx.done
         return workspace
       } catch (error) { try { tx.abort() } catch {} await tx.done.catch(() => {}); throw error }

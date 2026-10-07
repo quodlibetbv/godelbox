@@ -17,8 +17,9 @@ Read `PRODUCT.md` when changing UI. Use the fixed strict port 5173, Node version
 - The writable VFS and immutable full snapshots are the foundation. Code, data, dependencies, instructions, and conversation are files restored together. Do not introduce competing authoritative state fields.
 - Use one iframe with `sandbox="allow-scripts"`. Generated code and imported application libraries execute only inside it. Do not grant same-origin, fullscreen, navigation, or popup permissions.
 - Use a fixed host-owned bootstrap and structured payload transfer. Never concatenate generated file contents into host markup or scripts. Bind RPC to the expected iframe, fresh runtime session, and dedicated message port.
-- Support generic browser-ready classic scripts. Vue is a seed dependency, not a permanent application requirement. Do not add app categories, a general npm bundler, or generated-app compilation.
-- Package the deterministic seed, pinned Vue bytes, version provenance, and license locally. Start/restore must not depend on a CDN or AI request.
+- Support generic browser-ready classic scripts. p5.js is the current seed dependency, not a permanent application requirement. Do not add app categories, a general npm bundler, or generated-app compilation.
+- Package the deterministic seed, pinned library bytes, version provenance, and license locally. Publish the exact corresponding p5.js source alongside its LGPL notice. Start/restore must not depend on a CDN or AI request.
+- `ace.runtime.requestEdit(prompt)` hands a user-submitted app prompt to the same host editor and limits. Validate its schema, current session, workspace state, and recent user activation. Accepted editing ends the submitting runtime. Keep the permanent host prompt available.
 
 ## Persistence and operation control
 
@@ -42,6 +43,7 @@ Treat all repository content and history as potentially public, even while GitHu
 - Persist keys through host Settings as required by the spec. No `.env` setup or embedded provider credentials. Mask inputs and redact keys/sensitive headers from diagnostics, including provider errors that might echo them.
 - Capture a connection copy at operation start. Clear saved connection cancels and invalidates active AI work, removes the connection, and preserves project/history/usage.
 - Call configured providers directly from the browser. Preserve base-URL path prefixes, configurable token fields/instruction roles, and tool-call continuation fields. Report CORS/network errors accurately; no fake model fallback.
+- Live testing must use exactly the model supplied in the user's configuration. Do not substitute or try other real models without explicit authorization. Browser-intercepted synthetic model fixtures are separate automated tests.
 - Reserve/persist allowance before each model fetch. Failed, cancelled, timed-out, and connection-test calls count. Restore/import/reload never reset usage; only an explicit host reset creates a new allowance epoch.
 - Before every commit/push, review an explicit file list and staged contents with a secret scanner, such as Gitleaks. Scan complete history before a visibility change. Report unavailable scanning honestly. Ignore rules are a second layer, not proof that contents are safe.
 - If a real credential is detected, stop publication, remove it from the proposed content, and report the exposure without repeating its value. Any already-exposed credential requires replacement and history remediation.

@@ -14,6 +14,7 @@ const schemas: Record<string, object> = {
   'versions.checkpoint': { properties: { label: { type: 'string', maxLength: 200 } } },
   'runtime.ready': { properties: {} },
   'runtime.restart': { properties: {} },
+  'runtime.requestEdit': { properties: { prompt: { type: 'string', minLength: 1, maxLength: 8000 } }, required: ['prompt'] },
   'runtime.error': { properties: { message: { type: 'string', maxLength: 4000 } }, required: ['message'] },
   'ai.request': { properties: { messages: { type: 'array', minItems: 1, maxItems: 100, items: { type: 'object', properties: { role: { enum: ['user', 'assistant'] }, content: str }, required: ['role', 'content'], additionalProperties: false } }, maxOutputTokens: { type: 'integer', minimum: 1 } }, required: ['messages'] },
 }

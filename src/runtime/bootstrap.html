@@ -38,7 +38,7 @@
       release: url => { if (urls.delete(url)) URL.revokeObjectURL(url); },
     },
     versions: { checkpoint: label => request('versions.checkpoint', label === undefined ? {} : { label }) },
-    runtime: { ready: () => notify('runtime.ready'), restart: () => notify('runtime.restart') },
+    runtime: { ready: () => notify('runtime.ready'), restart: () => notify('runtime.restart'), requestEdit: prompt => request('runtime.requestEdit', { prompt }) },
     ai: { request: input => request('ai.request', input) },
   };
   function boot(payload) {

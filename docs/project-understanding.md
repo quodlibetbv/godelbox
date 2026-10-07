@@ -22,7 +22,7 @@ Manual restore preserves any dirty current state, copies the selected snapshot's
 | --- | --- |
 | Deployment | Static files over HTTPS or localhost; direct browser-to-provider requests. |
 | Host | TypeScript, Vue 3, Vite; development/build tools only. |
-| App runtime | HTML fragment, CSS, classic browser scripts; locally vendored full Vue build initially. |
+| App runtime | HTML fragment, CSS, classic browser scripts; locally vendored p5.js universe starter. |
 | Project storage | IndexedDB working VFS and full-copy snapshots. |
 | Connection storage | Complete model connection in host `localStorage`; separate from project/usage storage. |
 | AI | Non-streaming Chat Completions, generic tools, one model request at a time. |
@@ -45,6 +45,10 @@ These are testing obligations, not reasons to expand the MVP into a production p
 
 ## Implementation choices and publication
 
-The implementation uses Node 22.22.2, Vue 3.5.43, TypeScript 5.9.3, Vite 8.3.3, idb 8.0.4, Ajv 8.20.0, Vitest 5.0.3, and Playwright 1.63.0. Development and static-browser tests use `http://127.0.0.1:5173/`. The seed packages exact Vue bytes, hash/provenance, and its MIT notice. No provider model is baked into the app.
+The implementation uses Node 22.22.2, Vue 3.5.43, TypeScript 5.9.3, Vite 8.3.3, idb 8.0.4, Ajv 8.20.0, Vitest 5.0.3, and Playwright 1.63.0. Development and static-browser tests use `http://127.0.0.1:5173/`. The seed packages exact p5.js 2.3.3 bytes, hash/provenance, and its LGPL-2.1 notice. The static distribution also includes the exact corresponding unminified source. No provider model is baked into the app.
+
+The owner replaced the specification's counter seed with an animated universe and an in-app prompt asking “What do you want me to become?” The extension `ace.runtime.requestEdit(prompt)` validates the current runtime, recent user activation, workspace availability, and prompt, then runs the permanent host editor using the saved connection and limits. It ends the submitting runtime when editing is accepted. Missing connection settings leave the scene open and copy the prompt into the host for retry. This is an additional entry point to the same editor, not a second editing system.
+
+Existing working files are retained across upgrades. **Load universe starter** checkpoints dirty files and creates a manual child version containing the new seed; it preserves old branches, the model connection, and request usage. The previous counter remains a synthetic test fixture for the original engine acceptance coverage.
 
 The public repository and Pages site are under `quodlibetbv/godelbox`, following the owner's account correction. The earlier `delorionbv` copy is left for the owner to delete. Public visibility does not establish an open-source license. The welcome document remains at `about.html`; the root page is the adaptive engine when its deployment passes. See the implementation report for test and deployment evidence.

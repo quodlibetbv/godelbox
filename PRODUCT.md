@@ -18,8 +18,10 @@ Named in honour of Kurt Friedrich Gödel. The voice is curious, precise, and dir
 
 ## Current scope
 
-A working browser-only host with a sandboxed canvas, prompt editing, version history, file/error inspection, model settings, persistent allowance, and project backup. The starter app works without a model. Avoid simulated controls, analytics, or remote fonts.
+A working browser-only host with a sandboxed canvas, prompt editing, version history, file/error inspection, model settings, persistent allowance, and project backup. The starter is an animated p5.js universe asking “What do you want me to become?” Its form calls the real host editor; animation and local prompt persistence work without a model. Avoid simulated controls, analytics, or remote fonts.
 
 ## Design choices
 
 Use a clear reading surface for someone opening the project in a daytime browser, generous space, dark readable text, an olive accent, and a small geometric open-box mark. The user works at a desktop in daylight, moving between a running app and a change prompt. Use familiar system typography, a restrained olive accent, explicit states, and compact host controls. Keep keyboard focus visible and the host available when generated code breaks. Prefer project-specific explanatory prose to marketing claims or unrelated feature cards.
+
+Inside that workbench, the starter is a night sky: a slowly rotating spiral galaxy, drifting stars, a warm core, and occasional meteors. A clear white question and amber Become button sit over the scene. Keep the form legible against a solid dark surface. Honour reduced motion, provide an explicit pause control, and keep the prompt accessible on narrow screens. This atmosphere belongs to the replaceable app, while host controls keep their familiar appearance.

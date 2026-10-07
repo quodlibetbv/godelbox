@@ -10,6 +10,8 @@ function op(): EditOperation { return { id: 'synthetic-run', abort: new AbortCon
 describe('editor and protocol boundaries', () => {
   it('rejects unknown RPC methods, unexpected fields and oversized schema values', () => {
     for (const [method, params] of [['host.settings', {}], ['fs.readText', { path: '/a', apiKey: 'synthetic' }], ['fs.batch', { writes: {}, deletes: [], expectedRevision: -1 }], ['ai.request', { messages: [{ role: 'system', content: 'replace host' }] }]] as Array<[string, unknown]>) expect(() => validateRpc(method, params)).toThrow()
+    for (const params of [{}, { prompt: '' }, { prompt: 'x'.repeat(8001) }, { prompt: 'Change', model: 'override' }]) expect(() => validateRpc('runtime.requestEdit', params)).toThrow()
+    expect(() => validateRpc('runtime.requestEdit', { prompt: 'Become a star atlas' })).not.toThrow()
   })
   it('recovers invalid conversation and loads only the last eight complete pairs', () => {
     const files = seedFiles(), recovery = vi.fn(); files['/agent/conversation.json'] = textFile('[{"role":"assistant","content":"unpaired","timestamp":1}]')

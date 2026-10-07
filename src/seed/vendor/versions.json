@@ -1,10 +1,13 @@
 {
-  "/vendor/vue.global.prod.js": {
-    "name": "Vue",
-    "version": "3.5.43",
-    "url": "https://unpkg.com/vue@3.5.43/dist/vue.global.prod.js",
-    "sha256": "b72394052eef1eeda1752db3758ce1be6f88016903f22e5241cc732ea307478e",
-    "license": "MIT",
-    "licensePath": "/vendor/vue.LICENSE.txt"
+  "/vendor/p5.min.js": {
+    "name": "p5.js",
+    "version": "2.3.3",
+    "bundleReportedVersion": "2.3.1",
+    "url": "https://cdn.jsdelivr.net/npm/p5@2.3.3/lib/p5.min.js",
+    "sourceUrl": "https://quodlibetbv.github.io/godelbox/vendor/p5-2.3.3/p5.js",
+    "sha256": "3f8a0c739bd3c6350e239ff7187d38656ed2247e30a2b8084fd16a91e6e843ac",
+    "license": "LGPL-2.1",
+    "licensePath": "/vendor/p5.LICENSE.txt",
+    "upstreamSourceUrl": "https://github.com/processing/p5.js/tree/v2.3.3"
   }
 }

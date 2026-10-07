@@ -1,13 +1,13 @@
-<main id="seed">
-  <p class="eyebrow">Your starting point</p>
-  <h1>My adaptive app</h1>
-  <p class="intro">Use the Godelbox prompt to change this app. Your counter and note are stored in its files.</p>
-  <section aria-label="Counter" class="counter">
-    <button @click="counter--; persist()" aria-label="Decrease counter">−</button>
-    <output aria-label="Counter value">{{ counter }}</output>
-    <button @click="counter++; persist()" aria-label="Increase counter">+</button>
+<main id="universe">
+  <div id="cosmos" aria-hidden="true"></div>
+  <header class="universe-heading"><span class="wordmark">Godelbox</span><button id="motion" type="button" aria-label="Pause animation" aria-pressed="false">Pause motion</button></header>
+  <section class="invitation" aria-label="Become something new">
+    <h1 id="become-label">What do you want<br>me to become?</h1>
+    <form id="become-form">
+      <div class="prompt-entry"><textarea id="become-prompt" aria-labelledby="become-label" placeholder="Describe your idea…" rows="2" maxlength="8000" required></textarea><button id="become" type="button">Become <span aria-hidden="true">↗</span></button></div>
+      <div class="prompt-footer"><span id="save-state" role="status">Saved</span><span>Ctrl / Cmd + Enter</span></div>
+      <p id="prompt-error" role="alert" hidden></p>
+    </form>
   </section>
-  <label for="note">A note to keep</label>
-  <textarea id="note" v-model="note" @input="persist" rows="4"></textarea>
-  <p role="status" class="save-state">{{ saving }}</p>
+  <footer class="universe-footer"><span>A little universe. An open possibility.</span><span>Named for Kurt Friedrich Gödel</span></footer>
 </main>

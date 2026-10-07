@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 import type { ChatMessage } from '../../shared/types'
+import counterFixture from '../fixtures/counter-project.json' with { type: 'json' }
 export const MOCK = 'https://model.example.test/prefix/v1'
 export function reply(content: string) { return { choices: [{ finish_reason: 'stop', message: { role: 'assistant', content } }], usage: { prompt_tokens: 12, completion_tokens: 8 } } }
 export function calls(entries: Array<[string, object]>) {
@@ -13,7 +14,13 @@ export function calls(entries: Array<[string, object]>) {
   }
 }
 export async function closePanel(page: Page) { const close = page.getByRole('button', { name: 'Close panel', exact: true }); if (await close.isVisible()) await close.click() }
-export async function boot(page: Page) { await page.goto('/'); await expect(page.getByRole('button', { name: 'Save settings', exact: true })).toBeVisible(); await closePanel(page) }
+export async function bootUniverse(page: Page) { await page.goto('/'); await expect(page.getByRole('button', { name: 'Save settings', exact: true })).toBeVisible(); await closePanel(page) }
+export async function boot(page: Page) {
+  await bootUniverse(page); await page.getByRole('button', { name: 'Settings', exact: true }).click()
+  await page.getByLabel('Import project JSON (up to 128 MiB)').setInputFiles({ name: 'synthetic-counter.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(counterFixture)) })
+  page.once('dialog', dialog => dialog.accept()); await page.getByRole('button', { name: 'Import and replace project' }).click()
+  await expect(page.getByRole('status').filter({ hasText: /Project imported/ })).toBeVisible(); await closePanel(page)
+}
 export async function configure(page: Page) {
   await page.getByRole('button', { name: 'Settings', exact: true }).click()
   await page.getByLabel('Provider', { exact: true }).selectOption('custom')

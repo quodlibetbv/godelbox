@@ -8,7 +8,7 @@ The static Vue/TypeScript host owns Settings, persistent prompt, Start/Stop, his
 
 IndexedDB transactions coordinate working files, monotonic revisions, immutable full snapshots, branching restore, import, and persistent usage reservation. AI operates on an isolated draft with sequential schema-validated file tools, captured connection settings, bounded context/calls/tools, provider continuation messages, and explicit commit/activation guards. Stop/Restore/import/connection clearing invalidate pending work. Failed final storage commits keep a draft for explicit retry/export; other failed edits discard it. No backend, proxy, model environment setup, production fixtures, or automatic paid repair exists.
 
-The deterministic seed packages Vue 3.5.43's exact full global production bundle, SHA-256/source/version provenance, and MIT license. Non-Vue classic scripts and imported assets also work. The original Gödel welcome page remains at `about.html`.
+The deterministic seed now packages p5.js from npm `p5@2.3.3`: exact minified bytes, SHA-256/version/source provenance, and its LGPL-2.1 notice. The matching unminified source and license are published under `vendor/p5-2.3.3/`. Upstream's unchanged bundle reports `p5.VERSION` as 2.3.1; provenance records both identifiers. The earlier Vue counter is retained as a synthetic test fixture. Other classic scripts and imported assets also work. The original Gödel welcome page remains at `about.html`.
 
 ## Executed local checks
 
@@ -16,8 +16,8 @@ Node 22.22.2 and npm 10.9.7; Chromium 153.0.8010.12 through Playwright 1.63.0 on
 
 - `npm run build`: passed TypeScript/Vue checking and produced static `dist/` assets.
 - `npm run test`: **39 passed** across five files; persistence, import graph/path/size validation, connection storage/redaction, RPC schemas, editor boundaries, and direct model gateway tests.
-- `npm run test:e2e`: **25 passed**; served the production build with Python's generic static HTTP server on `http://127.0.0.1:5173/`. Provider/library responses were intercepted by Playwright, without a product backend or dev proxy.
-- Layout smoke: widths 1440, 390, and 320 passed without host horizontal overflow or browser errors. Desktop and mobile app/Settings screenshots were visually inspected in isolated browsers with no credentials. Keyboard focus remains visible.
+- `npm run test:e2e`: **32 passed**; served the production build with Python's generic static HTTP server on `http://127.0.0.1:5173/`. Provider/library responses were intercepted by Playwright, without a product backend or dev proxy. The original 25 engine cases use the synthetic counter fixture through the real project importer; seven cases exercise the new default universe.
+- Layout smoke: widths 1440, 390, and 320 passed without host horizontal overflow or browser errors. Desktop and mobile app/Settings screenshots were visually inspected in isolated browsers with no credentials. Keyboard focus remains visible. The universe form and Become button fit within the mobile canvas at all three widths. Measured starter text contrast: placeholder 8.58:1, Become button 13.67:1, footer 9.21:1 against its dark base.
 
 The tests use synthetic keys and headers. Browser traces and screenshots are disabled in the acceptance runner. No real provider connection is a repository fixture.
 
@@ -25,7 +25,7 @@ The tests use synthetic keys and headers. Browser traces and screenshots are dis
 
 | ID | Executed evidence |
 | --- | --- |
-| A01 | Empty-storage Start renders the locally vendored seed; no model fetch. |
+| A01 | Empty-storage Start renders the locally vendored p5.js universe offline; no model fetch. |
 | A02 | Live supplied OpenRouter model passed an actual two-request `ace_echo` tool round-trip; details below. |
 | A03 | Static-browser edit preserves a custom base path, selected completion field, developer instruction role, and extra header settings. |
 | A04 | Acknowledged counter/note persist across stopped reload and explicit Start; connection/allowance persist separately. |
@@ -58,6 +58,16 @@ The tests use synthetic keys and headers. Browser traces and screenshots are dis
 
 A22 used `ace.runtime.ready(); setTimeout(() => { while(true) {} }, 250)` in a saved classic script. After the loop began, the host Stop click completed within the test's three-second bound and removed the iframe; `?safe=1` reopened with no iframe or AI request. This is evidence for that Chromium configuration, not a CPU/memory guarantee for arbitrary browsers, mobile devices, or resource-exhaustion programs.
 
+## Universe starter and prompt handoff
+
+At the owner's request, the initial app is a p5.js spiral galaxy with stars, a warm core, pointer parallax, and occasional meteors. It asks “What do you want me to become?” and persists the typed prompt through acknowledged VFS writes. Pause motion and reduced-motion preferences stop drawing. All library bytes are local; the app requires no CDN connection.
+
+The SDK extension `ace.runtime.requestEdit(prompt)` passes a user-submitted prompt to the existing host editor. Host validation checks the current session, writer/workspace state, strict prompt schema, and recent user activation. The same saved connection, file tools, limits, dirty checkpoint, cancellation, and successful child-version commit apply. An accepted edit ends the old iframe. A missing connection leaves the scene running, shows a Settings instruction, and copies the prompt into the permanent host for retry. Click and Ctrl/Cmd + Enter handlers use SDK messages directly because the sandbox blocks native form submission.
+
+Seven browser cases verify actual pixel changes and paused stability, offline startup and prompt persistence across stopped reload, reduced-motion startup, delayed acknowledgements never marking newer input Saved, an in-app edit with two synthetic intercepted tool requests and restore, keyboard submission without a connection and rejection after user activation expires, preserved dirty counter files when loading the new starter, and Stop discarding a delayed in-app edit. Strict RPC tests reject missing/empty/oversized prompts and extra fields. No new live model request was made for this change; historical real-provider evidence below concerns the earlier counter.
+
+Existing browser projects remain unchanged on upgrade. **Settings → Load universe starter** creates a manual child version after preserving dirty files in History. It keeps the connection, allowance, and prior branches; restoring the earlier counter and its note passed.
+
 ## Live provider smoke
 
 The credential JSON supplied by the owner was read only from `/tmp`, outside the project. The API key was entered through Settings in a temporary isolated browser. No profile, trace, secret screenshot, connection export, or credential value was retained in repository artifacts.
@@ -72,6 +82,6 @@ The model is entered by the user, never hardcoded into production. A separate ex
 
 Public repository: `https://github.com/quodlibetbv/godelbox`. Pages: `https://quodlibetbv.github.io/godelbox/`. Local origin targets `quodlibetbv`. Engine commit `ddeda5a33919416744fc95785f1b0b5a9825eda5` passed the complete build, unit, browser, and deploy jobs in [Pages run 37582490187](https://github.com/quodlibetbv/godelbox/actions/runs/37582490187). The welcome-page deployment under that account passed before engine work; the old `delorionbv` copy is left for the owner to delete. Browser storage is origin-specific and does not move with repository publication.
 
-Only static build output is uploaded by the pinned-action workflow. No actual credentials are tracked. Gitleaks 8.30.1 found no leaks in the staged engine (~409 KiB) or complete five-commit history (~505 KiB) before publication. An additional exact-match check found the supplied key absent from staged files and `dist/`. Future commits/pushes must repeat the required scans.
+Only static build output is uploaded by the pinned-action workflow. No actual credentials are tracked. Gitleaks 8.30.1 found no leaks in the staged engine (~409 KiB) or complete five-commit history (~505 KiB) before publication. An additional exact-match check found the supplied key absent from staged files and `dist/`. The universe change also passed a staged scan of approximately 6.01 MB, including exact p5.js source and synthetic fixtures, with no leaks. Future commits/pushes must repeat the required scans.
 
 Unsupported vendor-specific APIs/authentication, CORS-blocked endpoints, arbitrary generated-app quality, headful/mobile browser resource isolation, and cross-origin browser-data migration are not verified. There is no automatic rollback, merge, cloud sync, storage garbage collection, or general npm compilation for generated apps.
