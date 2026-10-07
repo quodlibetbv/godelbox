@@ -15,7 +15,15 @@ Open **[Godelbox](https://quodlibetbv.github.io/godelbox/)**. It is named in hon
 
 Already have the earlier counter app or another saved project? Open **Settings → Load universe starter**. This preserves your current files in History, including acknowledged unsaved changes, and keeps your connection and usage. Existing projects are never silently replaced on reload.
 
-The app fills the window below a slim black header. The panel icon shows or hides the host prompt; hiding it keeps unsent text. History, Files, Errors, and Save version are inside that panel. Start/Stop and the Settings and GitHub icons remain in the header. On narrow screens the prompt opens over the canvas.
+The app fills the window below a slim black header. The panel icon shows or hides the host prompt; hiding it keeps unsent text. A host edit that changes app files closes the prompt panel and returns the canvas to full width. History, Files, Errors, and Save version are inside that panel. Start/Stop and the Settings and GitHub icons remain in the header. On narrow screens the prompt opens over the canvas.
+
+## Transform the app, then use it
+
+The universe's **Become** form and the host's **Shape your app** panel request changes to the application's files. A request such as “Become a motivational assistant” should build that experience inside the canvas, with its own input, responses, and saved data. A saved prompt alone is not a transformation. If a model only replies without changing any files other than editor conversation history, Godelbox reports **No app changes made** and keeps your prompt for retry. The conversation-only version remains in History; prose is not proof of working behavior.
+
+An AI-powered app uses `ace.ai.request` for everyday questions. The host supplies separate in-app response instructions, the latest versioned `/agent/instructions.md`, your configured model, and the existing allowance. Responses return to the running app; its code displays them and can persist its own conversation under `/data`. It must not forward ordinary questions, answers, or failures to `ace.runtime.requestEdit`. That API is for an explicit request to change the app. Editor history in `/agent/conversation.json` is separate from the app's conversation.
+
+Previously generated app code is preserved on upgrade. If it forwards chat to the editor or retained the universe's Become form, open the prompt panel, enable **Ignore app instructions / Repair mode**, and request a repair. For the motivational-assistant example: “Build a usable motivational assistant inside the app canvas, with its own chat UI and persisted conversation. Use ace.ai.request for replies; remove the old Become handler and every automatic requestEdit handoff, including error fallbacks. Update the app instructions to its motivational role.” This requires a new edit using your configured model; the platform cannot guarantee generated behavior from the model's final summary.
 
 ## Start fresh and report a problem
 

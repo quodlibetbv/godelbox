@@ -9,7 +9,7 @@ test('A10: next normal edit reads changed or missing app instructions', async ({
   await appFrame(page).evaluate(async () => { await (window as any).ace.fs.deleteFile('/agent/instructions.md'); await (window as any).ace.fs.writeText('/agent/conversation.json', 'broken') })
   await change(page, 'Keep the app intact'); expect(JSON.stringify(mock.bodies[3]!.messages)).not.toContain('UPDATED-BEHAVIOR-MARKER')
   expect(JSON.stringify(mock.bodies[3]!.messages)).toContain('Preserve unrelated files and persisted data.')
-  await page.getByRole('button', { name: /^Errors/ }).click(); await expect(page.getByRole('region', { name: 'Errors' }).getByText(/conversation file was missing or invalid/)).toBeVisible()
+  await closePanel(page); await page.getByRole('button', { name: /^Errors/ }).click(); await expect(page.getByRole('region', { name: 'Errors' }).getByText(/conversation file was missing or invalid/)).toBeVisible()
 })
 
 test('A28: clearing connection survives reload without removing project, history or usage', async ({ page }) => {

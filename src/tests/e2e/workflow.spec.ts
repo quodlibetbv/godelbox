@@ -17,6 +17,7 @@ test('A03/A05/A27/A29: real file-tool workflow from static build, connection opt
   await boot(page); await configure(page); const mock = await mockEditor(page); const app = await start(page)
   await app.getByRole('textbox', { name: 'A note to keep' }).fill('Keep my note'); await saved(page)
   await change(page, 'Add a reset button without losing my note.')
+  await expect(page.getByRole('complementary', { name: 'Host prompt' })).toBeHidden()
   await expect(page.frameLocator('iframe').getByRole('button', { name: 'Reset counter' })).toBeVisible()
   await expect(page.frameLocator('iframe').getByRole('textbox', { name: 'A note to keep' })).toHaveValue('Keep my note')
   expect(mock.count()).toBe(3); expect(mock.bodies[0]).toHaveProperty('max_completion_tokens'); expect(mock.bodies[0]).not.toHaveProperty('max_tokens'); expect(mock.bodies[0]!.messages[0].role).toBe('developer')

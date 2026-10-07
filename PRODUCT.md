@@ -12,6 +12,8 @@ Web. Static hosting on GitHub Pages; desktop Chromium is the prototype's initial
 
 A single user can reshape a browser app through prompts and restore saved versions of its code, data, dependencies, and instructions. See the supplied specification for the complete required workflow. The permanent host provides controls and a prompt outside the replaceable application.
 
+The generated app is the user's primary experience. Transformation prompts implement its interface and behavior; ordinary interactions and AI conversations belong inside that app. The platform prompt remains a hideable editing/repair control. A conversation-only editor response must be visibly distinguished from actual app changes.
+
 ## Name and voice
 
 Named in honour of Kurt Friedrich Gödel. The voice is curious, precise, and direct. Self-reference and recoverable change connect the name to the experiment; the welcome text does not attribute invented quotations or product claims to Gödel.

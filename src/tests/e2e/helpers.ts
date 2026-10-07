@@ -48,7 +48,7 @@ export async function state(page: Page) {
     return { project: projects[0], workspace: workspaces[0], snapshots, settings, usage }
   })
 }
-export async function saveVersion(page: Page, name: string) { await page.getByRole('button', { name: 'Save version', exact: true }).click(); await page.getByLabel('Version label').fill(name); await page.getByRole('region', { name: 'Save version' }).getByRole('button', { name: 'Save version', exact: true }).click(); await expect(page.getByRole('region', { name: 'Save version' })).toBeHidden() }
+export async function saveVersion(page: Page, name: string) { await closePanel(page); await page.getByRole('button', { name: 'Save version', exact: true }).click(); await page.getByLabel('Version label').fill(name); await page.getByRole('region', { name: 'Save version' }).getByRole('button', { name: 'Save version', exact: true }).click(); await expect(page.getByRole('region', { name: 'Save version' })).toBeHidden() }
 export async function restore(page: Page, name: string) { await closePanel(page); await page.getByRole('button', { name: 'History', exact: true }).click(); await page.getByRole('button', { name: new RegExp(`^${name}`) }).click(); await page.getByRole('button', { name: 'Restore selected version', exact: true }).click(); await expect(page.getByTestId('runtime-status')).toHaveText('Ready'); await closePanel(page) }
 export async function mockEditor(page: Page, transform: (html: string) => string = html => html.replace('</main>', '<button @click="counter=0; persist()">Reset counter</button></main>')) {
   let number = 0

@@ -49,7 +49,7 @@ async function saveSettings() {
   }
   catch (error) { settingsNotice.value = 'Not saved'; engine.report(error) }
 }
-async function send() { if (await engine.edit(prompt.value.trim(), ignore.value)) prompt.value = '' }
+async function send() { if (await engine.edit(prompt.value.trim(), ignore.value)) { prompt.value = ''; promptVisible.value = false } }
 function shortcut(event: KeyboardEvent) { if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.isComposing) { event.preventDefault(); if (!busy.value && state.writable && prompt.value.trim()) void act(send) } }
 function downloadJson(value: unknown, name: string) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }))
@@ -109,6 +109,7 @@ onBeforeUnmount(() => engine.dispose())
 
       <aside v-show="promptVisible" id="host-prompt-panel" class="prompt-region" aria-label="Host prompt">
         <div class="prompt-heading"><h2>Shape your app</h2><button aria-label="Hide prompt panel" @click="promptVisible = false">Close</button></div>
+        <p class="hint">Describe changes here. Use your app in the canvas.</p>
         <nav class="prompt-tools" aria-label="Project controls"><button :disabled="!hostReady || state.loading || !state.writable || busy" @click="toggle('Save version')">Save version</button><button v-for="name in ['History', 'Files', 'Errors']" :key="name" :aria-pressed="panel === name" @click="toggle(name)">{{ name }}<span v-if="name === 'Errors' && state.errors.length"> ({{ state.errors.length }})</span></button></nav>
         <div class="status-bar" aria-live="polite"><span>{{ head?.label ?? 'Preparing project…' }} <span v-if="dirty" class="dirty">· Changes since saved version</span></span><span>AI: <strong data-testid="ai-status">{{ state.aiStatus }}</strong> · {{ state.calls }} calls · {{ remaining }} requests left</span></div>
         <div class="conversation" aria-live="polite">

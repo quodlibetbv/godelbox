@@ -8,7 +8,7 @@ import { validateRpc } from '../runtime/schema'
 import { seedFiles } from '../seed'
 import { ModelGateway } from '../ai/client'
 import { appInstructions, conversation, runEditor } from '../ai/editor'
-import { HOST_INSTRUCTIONS } from '../ai/instructions'
+import { APP_AI_INSTRUCTIONS } from '../ai/instructions'
 import { Diagnostics, diagnosticDetails } from '../shared/diagnostics'
 
 interface EngineState {
@@ -183,10 +183,11 @@ export class Engine {
       }
       await this.refresh()
       if (operation.current()) {
-        this.state.aiStatus = 'Idle'; this.state.info = `${result.answer}\nSaved “${this.head?.label}”. Changed files: ${result.changed.join(', ')}.`
+        const appChanges = result.changed.filter(name => name !== '/agent/conversation.json')
+        this.state.aiStatus = 'Idle'; this.state.info = appChanges.length ? `Saved “${this.head?.label}”. Changed files: ${appChanges.join(', ')}.` : 'No app changes made. Only the editor conversation was saved. Your app remains unchanged.'
         this.operation = undefined
         await this.start()
-        return true
+        return appChanges.length > 0
       }
     } catch (error) { if (operation.current()) { this.state.aiStatus = 'Failed'; this.state.error = this.message(error, operation.connection) } }
     finally { if (this.operation === operation) { this.state.calls = operation.calls; this.state.tools = operation.tools; this.operation = undefined } }
@@ -268,7 +269,7 @@ export class Engine {
       const operation = this.newOperation(), current = operation.current
       operation.current = () => current() && valid(); this.state.aiStatus = 'Calling model'
       try {
-        const reply = await this.gateway.request(operation, [{ role: operation.connection.instructionRole, content: `${HOST_INSTRUCTIONS}\nSubordinate app instructions:\n${appInstructions(workspace.files)}` }, ...params.messages], 'app', undefined, params.maxOutputTokens)
+        const reply = await this.gateway.request(operation, [{ role: operation.connection.instructionRole, content: `${APP_AI_INSTRUCTIONS}\nApp behavioral instructions:\n${appInstructions(workspace.files)}` }, ...params.messages], 'app', undefined, params.maxOutputTokens)
         requireValue(operation.current() && reply.finish_reason === 'stop' && !reply.message.tool_calls?.length && typeof reply.message.content === 'string', 'App text request did not complete.', 'AI_REQUEST_FAILED')
         return { text: redact(reply.message.content, operation.connection) }
       } finally { if (this.operation === operation) { this.operation = undefined; this.state.aiStatus = 'Idle' } }
