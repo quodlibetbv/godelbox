@@ -14,6 +14,22 @@ beforeEach(async () => {
 afterEach(() => { db.db.close(); vi.unstubAllGlobals() })
 const final = { choices: [{ finish_reason: 'stop', message: { role: 'assistant', content: 'Synthetic response' } }] }
 describe('direct-browser gateway', () => {
+  it('counts an HTTP 200 error finish as failed even without a top-level error object', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ id: 'synthetic-failed-completion', provider: 'Synthetic provider', choices: [{ finish_reason: 'error', native_finish_reason: 'provider_disconnected', message: { role: 'assistant', content: 'discard this partial response' } }] }))))
+    await expect(gateway.request(operation, [{ role: 'user', content: 'Hello' }], 'editor')).rejects.toThrow(/Model ended with error/)
+    expect((await db.load()).usage[0]).toMatchObject({ outcome: 'failed', diagnostic: { httpStatus: 200, finishReason: 'error', nativeFinishReason: 'provider_disconnected', responseId: 'synthetic-failed-completion' } })
+  })
+  it.each([200, 503])('records provider failure at HTTP %i without exporting credentials, raw bodies or retrying', async status => {
+    operation.connection.apiKey = 'synthetic-credential-only'; operation.connection.extraHeaders = { 'X-Test': 'synthetic-header-only' }
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ id: 'synthetic-response-id', choices: [{ finish_reason: 'error', message: { role: 'assistant', content: 'private-response-body' } }], error: { code: 503, message: 'Provider returned error', metadata: { provider_name: 'Synthetic provider', raw: JSON.stringify({ error: { message: 'Model at capacity synthetic-credential-only synthetic-header-only', code: 'capacity' }, request: { prompt: 'private-prompt-body' } }) } } }), { status, headers: { 'x-request-id': 'synthetic-request-id' } }))
+    vi.stubGlobal('fetch', fetcher)
+    await expect(gateway.request(operation, [{ role: 'user', content: 'private-prompt-body' }], 'editor')).rejects.toThrow(/Model at capacity.*Try again later/)
+    expect(fetcher).toHaveBeenCalledTimes(1)
+    const state = await db.load(), diagnostic = state.usage[0]!.diagnostic!
+    expect(state.usage[0]!.outcome).toBe('failed'); expect(state.allowance.usedRequests).toBe(1)
+    expect(diagnostic).toMatchObject({ httpStatus: status, finishReason: 'error', provider: 'Synthetic provider', requestId: 'synthetic-request-id', responseId: 'synthetic-response-id', errorCode: 503 })
+    for (const value of ['synthetic-credential-only', 'synthetic-header-only', 'private-prompt-body', 'private-response-body']) expect(JSON.stringify(diagnostic)).not.toContain(value)
+  })
   it('reserves usage before fetch, preserves prefix/options and clamps app tokens', async () => {
     const fetcher = vi.fn(async (_url, options) => {
       expect((await db.load()).allowance.usedRequests).toBe(1)

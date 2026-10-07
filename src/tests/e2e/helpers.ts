@@ -13,7 +13,7 @@ export function calls(entries: Array<[string, object]>) {
     usage: { prompt_tokens: 12, completion_tokens: 8 },
   }
 }
-export async function closePanel(page: Page) { const close = page.getByRole('button', { name: 'Close panel', exact: true }); if (await close.isVisible()) await close.click() }
+export async function closePanel(page: Page) { await expect(page.getByRole('button', { name: 'Settings', exact: true })).toBeEnabled(); const close = page.getByRole('button', { name: 'Close panel', exact: true }); if (await close.isVisible()) await close.click(); const show = page.getByRole('button', { name: 'Show prompt', exact: true }); if (await show.isVisible()) await show.click() }
 export async function bootUniverse(page: Page) { await page.goto('/'); await expect(page.getByRole('button', { name: 'Save settings', exact: true })).toBeVisible(); await closePanel(page) }
 export async function boot(page: Page) {
   await bootUniverse(page); await page.getByRole('button', { name: 'Settings', exact: true }).click()

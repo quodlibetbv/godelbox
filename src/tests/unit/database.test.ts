@@ -7,6 +7,22 @@ let db: Database
 beforeEach(async () => { db = await Database.open(`test-${crypto.randomUUID()}`); await db.initialize(seedFiles(), true) })
 afterEach(() => db.db.close())
 describe('atomic storage and immutable history', () => {
+  it('resets all app files and history atomically while retaining settings, usage and increasing revision', async () => {
+    const before = await db.load(); await db.saveLimits({ ...before.limits, maxRequestsSinceReset: 77 })
+    const usage = await db.reserve('editor', 'synthetic-model', 100, 'synthetic-run', () => true); await db.finishUsage(usage.id, 'failed')
+    await db.write(before.project!.id, { writes: { '/private.txt': textFile('old app data') }, deletes: [] }, () => true)
+    await db.checkpoint(before.project!.id, 'manual', 'Old project')
+    const old = await db.load()
+    await expect(db.resetProject(seedFiles(), () => false)).rejects.toMatchObject({ code: 'SESSION_EXPIRED' }); expect((await db.load()).workspace).toEqual(old.workspace)
+    await db.resetProject(seedFiles(), () => true); const after = await db.load()
+    expect(after.project!.id).not.toBe(old.project!.id); expect(after.snapshots).toHaveLength(1); expect(after.workspace!.files).not.toHaveProperty('/private.txt'); expect(after.workspace!.revision).toBeGreaterThan(old.workspace!.revision)
+    expect(after.limits).toEqual(old.limits); expect(after.allowance).toEqual(old.allowance); expect(after.usage).toEqual(old.usage)
+  })
+  it('recreating a missing project does not replenish allowance or replace existing limits', async () => {
+    const before = await db.load(); await db.saveLimits({ ...before.limits, maxRequestsSinceReset: 77 }); await db.reserve('app', 'synthetic-model', 100, 'synthetic-run', () => true)
+    const tx = db.db.transaction(['projects', 'workspaces', 'snapshots'], 'readwrite'); await Promise.all(['projects', 'workspaces', 'snapshots'].map(name => tx.objectStore(name).clear())); await tx.done
+    await db.initialize(seedFiles(), true); const after = await db.load(); expect(after.limits.maxRequestsSinceReset).toBe(77); expect(after.allowance.usedRequests).toBe(1)
+  })
   it('saves dirty work on restore, preserves branches, and increases revision', async () => {
     const original = await db.load(), pid = original.project!.id, root = original.workspace!.headSnapshotId
     await db.write(pid, { writes: { '/data/state.json': textFile('B') }, deletes: [] }, () => true)

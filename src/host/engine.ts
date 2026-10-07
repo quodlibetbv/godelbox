@@ -9,6 +9,7 @@ import { seedFiles } from '../seed'
 import { ModelGateway } from '../ai/client'
 import { appInstructions, conversation, runEditor } from '../ai/editor'
 import { HOST_INSTRUCTIONS } from '../ai/instructions'
+import { Diagnostics, diagnosticDetails } from '../shared/diagnostics'
 
 interface EngineState {
   loading: boolean; writable: boolean; prompt: string; project?: Project; workspace?: Workspace; snapshots: Snapshot[]; limits: HostLimits; allowance: Allowance; usage: RequestUsage[]; connection: ModelConnection
@@ -24,6 +25,7 @@ export class Engine {
   private releaseLock?: () => void
   private pendingDraft?: { files: FileMap; revision: number; prompt: string; model: string }
   private destroy = false
+  private logs = new Diagnostics()
   get dirty() { const w = this.state.workspace; return !!w && w.revision !== w.lastCheckpointRevision }
   get busy() { return !!this.operation || this.state.filesBusy }
   get head() { return this.state.snapshots.find(x => x.id === this.state.workspace?.headSnapshotId) }
@@ -40,7 +42,8 @@ export class Engine {
       else this.state.error = 'This browser cannot acquire the required Web Lock. Open Godelbox in desktop Chromium.'
       this.database = await Database.open()
       this.applyLoaded(await this.database.initialize(seedFiles(), this.state.writable))
-      this.gateway = new ModelGateway(this.database, () => this.state.limits, () => this.refresh())
+      this.gateway = new ModelGateway(this.database, () => this.state.limits, () => this.refresh(), details => this.logs.record('model-request', details))
+      this.logs.record('host', { message: 'Workspace loaded', revision: this.state.workspace?.revision, snapshotCount: this.state.snapshots.length })
       if (this.state.writable) navigator.storage?.persist?.().catch(() => {})
     } catch (error) { this.state.error = this.message(error) } finally { this.state.loading = false }
   }
@@ -48,7 +51,11 @@ export class Engine {
     this.runtime = new Runtime(target, (method, params, valid) => this.dispatch(method, params, valid), status => { this.state.runtimeStatus = status }, message => this.diagnostic(message))
   }
   dispose() { this.destroy = true; this.stop(); this.releaseLock?.(); this.database?.db.close() }
-  private message(error: unknown, connection = this.state.connection) { return redact(error instanceof Error ? error.message : String(error), connection) }
+  private message(error: unknown, connection = this.state.connection) {
+    const message = redact(error instanceof Error ? error.message : String(error), connection)
+    this.logs.record('error', { message, errorCode: error instanceof AceError ? error.code : undefined })
+    return message
+  }
   private diagnostic(message: string) { this.state.errors = [...this.state.errors.slice(-99), this.message(message)] }
   private applyLoaded(data: Awaited<ReturnType<Database['load']>>) {
     this.state.project = data.project; this.state.workspace = data.workspace; this.state.snapshots = data.snapshots.sort((a, b) => a.createdAt - b.createdAt)
@@ -100,6 +107,32 @@ export class Engine {
       await this.refresh()
       if (valid()) { this.state.filesBusy = false; this.state.aiStatus = 'Idle'; await this.start(); this.state.info = 'Universe starter loaded. Earlier versions remain in History.' }
     } finally { if (valid()) this.state.filesBusy = false }
+  }
+  async resetProject() {
+    this.requireWriter(); this.stop(); this.state.filesBusy = true
+    const epoch = this.epoch, valid = () => epoch === this.epoch
+    try {
+      await this.database.resetProject(seedFiles(), valid); await this.refresh()
+      if (valid()) {
+        this.state.prompt = ''; this.state.error = ''; this.state.errors = []; this.state.aiStatus = 'Idle'; this.state.calls = 0; this.state.tools = 0
+        this.state.info = 'Fresh universe created. Press Start. Your connection, limits, and request usage are unchanged.'
+        this.logs.record('host', { message: 'Project reset; settings and usage retained', revision: this.state.workspace?.revision })
+      }
+    } finally { if (valid()) this.state.filesBusy = false }
+  }
+  exportDiagnostics() {
+    const s = this.state, c = s.connection
+    const clean = (text: string) => redact(text, c)
+    return {
+      format: 'godelbox-diagnostics', schemaVersion: 1, exportedAt: new Date().toISOString(),
+      environment: { browser: navigator.userAgent, page: `${location.origin}${location.pathname}`, buildAsset: document.querySelector<HTMLScriptElement>('script[src]')?.getAttribute('src') },
+      connection: { preset: c.preset, endpointOrigin: new URL(c.baseUrl).origin, model: clean(c.model), authMode: c.authMode, hasApiKey: !!c.apiKey, extraHeaderCount: Object.keys(c.extraHeaders).length, tokenLimitParameter: c.tokenLimitParameter, instructionRole: c.instructionRole, temperature: c.temperature, requestTimeoutMs: c.requestTimeoutMs },
+      host: { writable: s.writable, runtimeStatus: s.runtimeStatus, aiStatus: s.aiStatus, calls: s.calls, tools: s.tools, error: clean(s.error), settingsError: clean(s.settingsError), runtimeErrors: s.errors.map(clean), unsavedDraft: s.unsavedDraft },
+      workspace: { revision: s.workspace?.revision, headSnapshotId: s.workspace?.headSnapshotId, snapshotCount: s.snapshots.length, fileCount: Object.keys(s.workspace?.files ?? {}).length, dirty: this.dirty },
+      limits: { ...s.limits }, allowance: { ...s.allowance },
+      requests: s.usage.slice(0, 200).map(u => ({ id: u.id, budgetEpochId: u.budgetEpochId, startedAt: u.startedAt, editRunId: u.editRunId, source: u.source, model: clean(u.model), completionTokenCap: u.completionTokenCap, outcome: u.outcome, promptTokens: u.promptTokens, completionTokens: u.completionTokens, providerCost: u.providerCost, providerCostUnit: u.providerCostUnit === undefined ? undefined : clean(u.providerCostUnit), diagnostic: diagnosticDetails(u.diagnostic, c) })),
+      events: this.logs.export(c), omitted: ['API keys', 'header values', 'request and response bodies', 'app files and data', 'prompts and conversation', 'endpoint query strings'],
+    }
   }
   exportProject(draft = false): ProjectExport {
     requireValue(this.state.project && this.state.workspace, 'No project is available.')

@@ -15,6 +15,18 @@ Open **[Godelbox](https://quodlibetbv.github.io/godelbox/)**. It is named in hon
 
 Already have the earlier counter app or another saved project? Open **Settings → Load universe starter**. This preserves your current files in History, including acknowledged unsaved changes, and keeps your connection and usage. Existing projects are never silently replaced on reload.
 
+The app fills the window below a slim black header. The panel icon shows or hides the host prompt; hiding it keeps unsent text. History, Files, Errors, and Save version are inside that panel. Start/Stop and the Settings and GitHub icons remain in the header. On narrow screens the prompt opens over the canvas.
+
+## Start fresh and report a problem
+
+Use **Settings → Clear app and history** to replace the current app, all its data, and every saved version with a fresh universe. Confirm the deletion, then press **Start**. Your saved model connection, limits, request allowance, and usage records remain. Export the project before clearing if you want a backup. **Load universe starter** is the separate option that keeps your history.
+
+After a failure, select **Export diagnostics** in the error notice, Settings, or Errors. It downloads a `godelbox-diagnostics-….json` file with browser/build information, host state, recent request accounting, timings, available HTTP status/request IDs, provider error codes/details, and runtime errors. Attach that file when reporting a problem. New request diagnostics survive reload in the existing usage records; general host/runtime events cover the current session. The export is limited to the latest 200 requests and 200 events. Earlier requests cannot gain details that were never collected.
+
+Diagnostic exports omit API keys, header values, request/response bodies, app files/data, prompt bodies, and conversations. Known connection secrets are redacted when messages are collected and again when exported. Error text can contain content supplied by the app or provider, so review it before sharing.
+
+Capacity/rate-limit responses now retain the provider's available explanation, including errors inside a response with HTTP 200. An errored completion is counted as failed and cannot apply a draft. There is no automatic retry or change of model; provider availability cannot be fixed by resetting your app. See [OpenRouter's response/error schema](https://github.com/OpenRouterTeam/docs/blob/main/api_reference/overview.mdx).
+
 The model must support Chat Completions tool calling and direct browser requests with CORS. Plain chat support alone is insufficient. Requests go straight to your saved endpoint, without a backend or proxy. Provider failures are visible; there is no simulated fallback or automatic retry. Generated app quality depends on the selected model.
 
 ## Local development and static deployment

@@ -31,7 +31,7 @@ test('model discovery accepts data[].id and reports failure without preventing m
 test('A14: malformed provider JSON and HTTP errors never apply draft writes', async ({ page }) => {
   await boot(page); await configure(page)
   for (const kind of ['json', 'http']) {
-    if (kind === 'http') await page.reload()
+    if (kind === 'http') { await page.reload(); await closePanel(page) }
     await page.route(`${MOCK}/chat/completions`, route => route.fulfill(kind === 'json' ? { body: '{invalid', contentType: 'application/json' } : { status: 401, json: { error: { message: 'Synthetic authentication failure synthetic-test-only' } } }))
     const before = await state(page); await page.getByLabel('What would you like to change?').fill('Broken response'); await page.getByRole('button', { name: 'Send', exact: true }).click(); await expect(page.getByTestId('ai-status')).toHaveText('Failed')
     expect((await state(page)).workspace).toEqual(before.workspace); expect((await state(page)).snapshots).toEqual(before.snapshots)

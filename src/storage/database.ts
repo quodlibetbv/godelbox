@@ -33,7 +33,9 @@ export class Database {
         const workspace: Workspace = { projectId: project.id, revision: 0, lastCheckpointRevision: 0, headSnapshotId: '', files: copyFiles(files) }
         const snapshot = this.snapshot(workspace, 'seed', 'First version'); workspace.headSnapshotId = snapshot.id
         const tx = this.db.transaction(['projects', 'workspaces', 'snapshots', 'settings'], 'readwrite'); void tx.done.catch(() => {})
-        await Promise.all([tx.objectStore('projects').put(project), tx.objectStore('workspaces').put(workspace), tx.objectStore('snapshots').add(snapshot), tx.objectStore('settings').put({ key: 'limits', value: DEFAULT_LIMITS }), tx.objectStore('settings').put({ key: 'allowance', value: { epochId: crypto.randomUUID(), usedRequests: 0, resetAt: Date.now() } })])
+        await Promise.all([tx.objectStore('projects').put(project), tx.objectStore('workspaces').put(workspace), tx.objectStore('snapshots').add(snapshot)])
+        if (!await tx.objectStore('settings').get('limits')) await tx.objectStore('settings').put({ key: 'limits', value: DEFAULT_LIMITS })
+        if (!await tx.objectStore('settings').get('allowance')) await tx.objectStore('settings').put({ key: 'allowance', value: { epochId: crypto.randomUUID(), usedRequests: 0, resetAt: Date.now() } })
         await tx.done
       }
       if (writable) {
@@ -131,6 +133,13 @@ export class Database {
         await tx.done; return workspace
       } catch (error) { try { tx.abort() } catch {} await tx.done.catch(() => {}); throw error }
     })
+  }
+  resetProject(files: FileMap, valid: () => boolean) {
+    validateFiles(files)
+    const project: Project = { id: crypto.randomUUID(), name: 'Godelbox', createdAt: Date.now() }
+    const workspace: Workspace = { projectId: project.id, revision: 0, lastCheckpointRevision: 0, headSnapshotId: '', files: copyFiles(files) }
+    const root = this.snapshot(workspace, 'seed', 'First version'); workspace.headSnapshotId = root.id
+    return this.import({ format: 'ace-project', schemaVersion: 1, exportedAt: Date.now(), project, workspace, snapshots: [root] }, valid)
   }
   reserve(source: RequestUsage['source'], model: string, cap: number, editRunId: string, valid: () => boolean) {
     return this.run(async () => {

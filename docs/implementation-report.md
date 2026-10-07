@@ -15,8 +15,8 @@ The deterministic seed now packages p5.js from npm `p5@2.3.3`: exact minified by
 Node 22.22.2 and npm 10.9.7; Chromium 153.0.8010.12 through Playwright 1.63.0 on Linux, headless with the OS sandbox disabled for the root test runner. Site isolation uses Chromium defaults; it was not disabled or altered to obtain a passing recovery test.
 
 - `npm run build`: passed TypeScript/Vue checking and produced static `dist/` assets.
-- `npm run test`: **39 passed** across five files; persistence, import graph/path/size validation, connection storage/redaction, RPC schemas, editor boundaries, and direct model gateway tests.
-- `npm run test:e2e`: **32 passed**; served the production build with Python's generic static HTTP server on `http://127.0.0.1:5173/`. Provider/library responses were intercepted by Playwright, without a product backend or dev proxy. The original 25 engine cases use the synthetic counter fixture through the real project importer; seven cases exercise the new default universe.
+- `npm run test`: **44 passed** across five files; persistence/reset, import graph/path/size validation, connection storage/redaction, RPC schemas, editor boundaries, provider error metadata, and direct model gateway tests.
+- `npm run test:e2e`: **35 passed**; served the production build with Python's generic static HTTP server on `http://127.0.0.1:5173/`. Provider/library responses were intercepted by Playwright, without a product backend or dev proxy. The original 25 engine cases use the synthetic counter fixture through the real project importer; seven cases exercise the default universe; three cover minimal framing, diagnostic privacy/persistence, and fresh-start cancellation/settings preservation.
 - Layout smoke: widths 1440, 390, and 320 passed without host horizontal overflow or browser errors. Desktop and mobile app/Settings screenshots were visually inspected in isolated browsers with no credentials. Keyboard focus remains visible. The universe form and Become button fit within the mobile canvas at all three widths. Measured starter text contrast: placeholder 8.58:1, Become button 13.67:1, footer 9.21:1 against its dark base.
 
 The tests use synthetic keys and headers. Browser traces and screenshots are disabled in the acceptance runner. No real provider connection is a repository fixture.
@@ -68,7 +68,19 @@ Seven browser cases verify actual pixel changes and paused stability, offline st
 
 Existing browser projects remain unchanged on upgrade. **Settings → Load universe starter** creates a manual child version after preserving dirty files in History. It keeps the connection, allowance, and prior branches; restoring the earlier counter and its note passed.
 
+## Minimal frame, fresh start, and diagnostics
+
+The owner's follow-up replaces the larger host chrome with a 52px black header, Settings/GitHub/prompt icons, and compact Start/Stop. The default canvas has no surrounding margin, border, or status strip. The prompt starts hidden, keeps unsent text when toggled, sits beside the app on desktop, and overlays it on narrow screens. History, file/error inspection, Save version, and detailed status remain inside that panel. Settings opens below the header, keeping Stop available. Visual checks inspected the full canvas at 1440/390/320px and prompt/Settings views at 1440/390px, with no browser errors or horizontal overflow.
+
+**Clear app and history** requires explicit destructive confirmation, revokes the current runtime/edit, and uses the existing atomic project replacement transaction to create a new project and seed root. It deletes old app/history records while keeping localStorage connection settings and IndexedDB limits, allowance, and usage. Execution stays stopped. Tests cover confirmation cancellation, a pending old model result after reset, preserved settings/accounting across reload, and monotonic revisions. Recreating a missing project also now keeps existing limits and allowance instead of resetting them implicitly.
+
+**Export diagnostics** is available from Settings, Errors, and host error notices. Its explicit allowlists include browser/build, host/workspace metadata, compatibility options, up to 200 request summaries, and 200 session events. New request summaries persist with host usage records; no database schema change is required. They capture timings, request sizes/counts, available HTTP status/response IDs/CORS-exposed request IDs, provider error code/name/message, and finish reasons. They omit credential/header values, app source/data, prompt/conversation bodies, and request/response bodies. Known captured-connection secrets are redacted before persistence; exports redact again. Raw upstream error JSON is parsed only to extract known nested error fields, never copied wholesale. Error text may contain provider/app content, so the UI asks users to review it before sharing.
+
+Gateway tests exercise HTTP 503 capacity errors and HTTP 200/error completions, with and without a top-level error object. They retain metadata, count the attempt as failed, and make no retry. A browser test submits a synthetic draft write followed by a capacity error; the draft remains unapplied. Its actual downloaded report excludes synthetic keys/headers, private prompt/note/response bodies, and discarded draft contents; provider metadata survives reload. These changes improve diagnosis, not provider capacity. No real endpoint/model was contacted for this change.
+
 ## Live provider smoke
+
+The minimal-frame/diagnostics change was verified with synthetic intercepted responses, including HTTP 200/error and HTTP 503/capacity failures. No new live provider request or model substitution was made for this change.
 
 The credential JSON supplied by the owner was read only from `/tmp`, outside the project. The API key was entered through Settings in a temporary isolated browser. No profile, trace, secret screenshot, connection export, or credential value was retained in repository artifacts.
 
