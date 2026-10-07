@@ -1,0 +1,17 @@
+{
+  "name": "godelbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5173 --strictPort",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": { "ajv": "8.20.0", "idb": "8.0.4", "vue": "3.5.43" },
+  "devDependencies": { "@playwright/test": "1.63.0", "@vitejs/plugin-vue": "6.0.9", "fake-indexeddb": "6.2.5", "typescript": "5.9.3", "vite": "8.3.3", "vitest": "5.0.3", "vue-tsc": "3.3.12" }
+}

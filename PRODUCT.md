@@ -2,7 +2,7 @@
 
 ## Register
 
-Product: a personal adaptive application canvas. The current welcome document is a small brand surface introducing that future product.
+Product: a personal adaptive application canvas. The welcome document remains as an About page.
 
 ## Platform
 
@@ -10,7 +10,7 @@ Web. Static hosting on GitHub Pages; desktop Chromium is the prototype's initial
 
 ## Purpose and users
 
-A single user can reshape a browser app through prompts and restore saved versions of its code, data, dependencies, and instructions. See the supplied specification for the complete required workflow. The welcome page's immediate job is to provide an accessible public URL and explain the project.
+A single user can reshape a browser app through prompts and restore saved versions of its code, data, dependencies, and instructions. See the supplied specification for the complete required workflow. The permanent host provides controls and a prompt outside the replaceable application.
 
 ## Name and voice
 
@@ -18,8 +18,8 @@ Named in honour of Kurt Friedrich Gödel. The voice is curious, precise, and dir
 
 ## Current scope
 
-A real static hello-world document with a link to the public source repository. No simulated canvas, inactive application controls, model requests, analytics, remote fonts, or credential configuration. The full engine remains pending.
+A working browser-only host with a sandboxed canvas, prompt editing, version history, file/error inspection, model settings, persistent allowance, and project backup. The starter app works without a model. Avoid simulated controls, analytics, or remote fonts.
 
-## Design choices for this first page
+## Design choices
 
-Use a clear reading surface for someone opening the project in a daytime browser, generous space, dark readable text, an olive accent, and a small geometric open-box mark. Keep keyboard focus visible and the page readable without scripts. Prefer project-specific explanatory prose to marketing claims or unrelated feature cards.
+Use a clear reading surface for someone opening the project in a daytime browser, generous space, dark readable text, an olive accent, and a small geometric open-box mark. The user works at a desktop in daylight, moving between a running app and a change prompt. Use familiar system typography, a restrained olive accent, explicit states, and compact host controls. Keep keyboard focus visible and the host available when generated code breaks. Prefer project-specific explanatory prose to marketing claims or unrelated feature cards.

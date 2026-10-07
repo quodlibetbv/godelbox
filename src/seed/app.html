@@ -1,0 +1,13 @@
+<main id="seed">
+  <p class="eyebrow">Your starting point</p>
+  <h1>My adaptive app</h1>
+  <p class="intro">Use the Godelbox prompt to change this app. Your counter and note are stored in its files.</p>
+  <section aria-label="Counter" class="counter">
+    <button @click="counter--; persist()" aria-label="Decrease counter">−</button>
+    <output aria-label="Counter value">{{ counter }}</output>
+    <button @click="counter++; persist()" aria-label="Increase counter">+</button>
+  </section>
+  <label for="note">A note to keep</label>
+  <textarea id="note" v-model="note" @input="persist" rows="4"></textarea>
+  <p role="status" class="save-state">{{ saving }}</p>
+</main>

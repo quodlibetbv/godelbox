@@ -1,0 +1,10 @@
+{
+  "/vendor/vue.global.prod.js": {
+    "name": "Vue",
+    "version": "3.5.43",
+    "url": "https://unpkg.com/vue@3.5.43/dist/vue.global.prod.js",
+    "sha256": "b72394052eef1eeda1752db3758ce1be6f88016903f22e5241cc732ea307478e",
+    "license": "MIT",
+    "licensePath": "/vendor/vue.LICENSE.txt"
+  }
+}

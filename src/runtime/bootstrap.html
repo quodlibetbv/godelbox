@@ -1,0 +1,80 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Godelbox application</title></head><body><div id="ace-root"></div><script>
+(() => {
+  'use strict';
+  const sessionId = window.name;
+  let port, sequence = 0;
+  const pending = new Map(), urls = new Set();
+  function request(method, params = {}) {
+    return new Promise((resolve, reject) => {
+      if (!port) { reject(new Error('Application bridge unavailable.')); return; }
+      const requestId = String(++sequence);
+      pending.set(requestId, { resolve, reject });
+      port.postMessage({ protocol: 'ace/1', sessionId, requestId, method, params });
+    });
+  }
+  function notify(method, params) { request(method, params).catch(() => {}); }
+  function report(error) {
+    notify('runtime.error', { message: String(error && error.message || error).slice(0, 4000) });
+  }
+  window.addEventListener('error', event => report(`${event.message} (${event.filename}:${event.lineno}:${event.colno})`));
+  window.addEventListener('unhandledrejection', event => report(event.reason));
+  window.ace = {
+    fs: {
+      list: prefix => request('fs.list', prefix === undefined ? {} : { prefix }),
+      readText: path => request('fs.readText', { path }),
+      readFile: path => request('fs.readFile', { path }),
+      writeText: (path, content, mediaType) => request('fs.writeText', { path, content, ...(mediaType === undefined ? {} : { mediaType }) }),
+      writeFile: (path, file) => request('fs.writeFile', { path, file }),
+      deleteFile: path => request('fs.deleteFile', { path }),
+      getRevision: () => request('fs.getRevision'),
+      batch: change => request('fs.batch', change),
+    },
+    assets: {
+      url: async path => {
+        const file = await request('fs.readFile', { path });
+        const bytes = file.encoding === 'utf8' ? file.content : Uint8Array.from(atob(file.content), c => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: file.mediaType })); urls.add(url); return url;
+      },
+      release: url => { if (urls.delete(url)) URL.revokeObjectURL(url); },
+    },
+    versions: { checkpoint: label => request('versions.checkpoint', label === undefined ? {} : { label }) },
+    runtime: { ready: () => notify('runtime.ready'), restart: () => notify('runtime.restart') },
+    ai: { request: input => request('ai.request', input) },
+  };
+  function boot(payload) {
+    try {
+      const { manifest, files } = payload;
+      const fragment = document.createElement('template');
+      fragment.innerHTML = files[manifest.html].content;
+      function validate(root) {
+        if (root.querySelector('script:not([type="application/json"]):not([type="application/ld+json"]), link[rel~="stylesheet"]')) throw new Error('Put executable scripts and stylesheet links in /app/boot.json, not the HTML fragment.');
+        for (const nested of root.querySelectorAll('template')) validate(nested.content);
+      }
+      validate(fragment.content);
+      document.getElementById('ace-root').append(fragment.content);
+      for (const path of manifest.styles) {
+        const style = document.createElement('style'); style.textContent = files[path].content; document.head.append(style);
+      }
+      for (const path of manifest.scripts) {
+        const script = document.createElement('script'); script.textContent = files[path].content + '\n//# sourceURL=ace-vfs' + path.replace(/[\r\n]/g, ''); document.body.append(script);
+      }
+    } catch (error) { report(error); }
+  }
+  window.addEventListener('message', event => {
+    if (event.source !== parent || port || !event.data || event.data.protocol !== 'ace/1' || event.data.sessionId !== sessionId || event.data.type !== 'connect' || event.ports.length !== 1) return;
+    port = event.ports[0];
+    port.onmessage = event => {
+      const message = event.data;
+      if (!message || message.protocol !== 'ace/1' || message.sessionId !== sessionId) return;
+      if (message.type === 'boot') { boot(message); return; }
+      const operation = pending.get(message.requestId);
+      if (!operation) return;
+      pending.delete(message.requestId);
+      if (message.ok) operation.resolve(message.result);
+      else { const error = new Error(message.error.message); error.code = message.error.code; operation.reject(error); }
+    };
+    port.start();
+  });
+  parent.postMessage({ protocol: 'ace/1', type: 'bootstrap', sessionId }, '*');
+})();
+</script></body></html>

@@ -1,6 +1,6 @@
 # Implementation plan
 
-Authority: [_specs/ace-mvp-specification-v1.1.md](../_specs/ace-mvp-specification-v1.1.md), especially Sections 16–18. This plan follows its implementation order. All engine milestones below are pending. A separate static welcome page in `site/` establishes public GitHub Pages hosting before engine implementation.
+Authority: [_specs/ace-mvp-specification-v1.1.md](../_specs/ace-mvp-specification-v1.1.md), especially Sections 16–18. This plan follows its implementation order. The engine milestones below are implemented. Local deterministic tests and target-browser recovery have passed; live-provider and deployment evidence is recorded in [the implementation report](implementation-report.md). The original welcome page is retained as `public/about.html`.
 
 ## 1. Host, storage, seed, and runtime
 

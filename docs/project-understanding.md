@@ -43,8 +43,8 @@ Repository secrecy and browser credential persistence are separate requirements:
 
 These are testing obligations, not reasons to expand the MVP into a production platform.
 
-## Decisions remaining for implementation
+## Implementation choices and publication
 
-Choose actual Node/dependency versions, the fixed development origin/port, a small persistence wrapper or direct IndexedDB implementation, test tooling, and concrete host visual design when scaffolding begins. Pin and record those choices. Select a live model at test time through Settings; do not bake a provider model into the app.
+The implementation uses Node 22.22.2, Vue 3.5.43, TypeScript 5.9.3, Vite 8.3.3, idb 8.0.4, Ajv 8.20.0, Vitest 5.0.3, and Playwright 1.63.0. Development and static-browser tests use `http://127.0.0.1:5173/`. The seed packages exact Vue bytes, hash/provenance, and its MIT notice. No provider model is baked into the app.
 
-The owner has requested that `quodlibetbv/godelbox` become public and publish a first welcome document through GitHub Pages. Public visibility does not establish an open-source license. The static page introduces the project and its namesake; the adaptive engine and its acceptance behavior remain unimplemented.
+The public repository and Pages site are under `quodlibetbv/godelbox`, following the owner's account correction. The earlier `delorionbv` copy is left for the owner to delete. Public visibility does not establish an open-source license. The welcome document remains at `about.html`; the root page is the adaptive engine when its deployment passes. See the implementation report for test and deployment evidence.
