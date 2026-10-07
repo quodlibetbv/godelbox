@@ -6,7 +6,7 @@ An independent host provides the permanent prompt, Start, Stop, Settings, Files,
 
 ## Status
 
-The public [welcome page](https://delorionbv.github.io/godelbox/) introduces the project and its namesake, Kurt Friedrich Gödel. It is a static hello-world document; the adaptive application engine, package scripts, and acceptance tests have not been implemented yet.
+The public [welcome page](https://quodlibetbv.github.io/godelbox/) introduces the project and its namesake, Kurt Friedrich Gödel. It is a static hello-world document; the adaptive application engine, package scripts, and acceptance tests have not been implemented yet.
 
 The supplied [prototype specification](_specs/ace-mvp-specification-v1.1.md) is the implementation authority. Godelbox is the project name; ACE is the specification's working name. Existing `ace/1`, `window.ace`, storage keys, and export formats remain the specified contracts until explicitly revised.
 
@@ -45,7 +45,7 @@ Open `http://127.0.0.1:5173/`. Port 5173 is fixed; this static server is preview
 
 When the adaptive engine is implemented, update this workflow to build and publish its static output. The welcome page does not establish any of the engine's A01–A30 acceptance results.
 
-The local preview and published GitHub Pages smoke tests passed in headless Chromium 149.0.7827.55 at viewport widths 1440, 390, and 320 pixels: page/favicon returned HTTP 200, no horizontal overflow or browser errors occurred, keyboard focus was visible, and tested text contrast exceeded 4.5:1. Desktop and mobile screenshots were visually reviewed. The [initial Pages deployment](https://github.com/delorionbv/godelbox/actions/runs/37577912086) succeeded on 7 October 2026. This verifies the welcome document only.
+The local preview and published GitHub Pages smoke tests passed in headless Chromium 149.0.7827.55 at viewport widths 1440, 390, and 320 pixels: page/favicon returned HTTP 200, no horizontal overflow or browser errors occurred, keyboard focus was visible, and tested text contrast exceeded 4.5:1. Desktop and mobile screenshots were visually reviewed. This verifies the welcome document only.
 
 ## Secrets and repository contents
 
